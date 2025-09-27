@@ -41,10 +41,13 @@ class HireHiScraper:
             'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
             'Accept': 'application/json, text/plain, */*',
             'Accept-Language': 'ru-RU,ru;q=0.9,en;q=0.8',
-            'Accept-Encoding': 'gzip, deflate, br',
+            'Accept-Encoding': 'gzip, deflate',  # Убираем br (brotli)
             'Connection': 'keep-alive',
             'Referer': 'https://hirehi.ru/',
         })
+        
+        # Включаем автоматическую декомпрессию
+        self.session.stream = False
         
         # Установка адаптера для автоматической декомпрессии
         from requests.adapters import HTTPAdapter
@@ -84,6 +87,10 @@ class HireHiScraper:
             logger.info(f"Запрашиваем страницу {page} с лимитом {limit}")
             response = self.session.get(self.api_url, params=params, timeout=30)
             response.raise_for_status()
+            
+            # Проверяем, что ответ декомпрессирован
+            logger.debug(f"Response headers: {dict(response.headers)}")
+            logger.debug(f"Response content length: {len(response.content)}")
             
             data = response.json()
             jobs = data.get('jobs', [])
