@@ -155,7 +155,7 @@ class HireHiScraper:
             'salary': job.get('salary', 'Не указано'),
             'level': job.get('level', 'Не указано'),
             'format': job.get('format', 'Не указано'),
-            'url': f"{self.base_url}/job/{job.get('id', '')}" if job.get('id') else 'Не указано'
+            'url': self._generate_job_url(job)
         }
     
     def filter_jobs_by_keywords(self, jobs: List[Dict], keywords: List[str]) -> List[Dict]:
@@ -187,6 +187,40 @@ class HireHiScraper:
                 logger.debug(f"Вакансия '{job.get('title', '')}' не прошла фильтр по ключевым словам")
         
         return filtered_jobs
+    
+    def _generate_job_url(self, job: Dict) -> str:
+        """
+        Генерирует правильную ссылку на вакансию в формате hirehi.ru
+        
+        Args:
+            job: Объект вакансии
+            
+        Returns:
+            Правильная ссылка на вакансию
+        """
+        job_id = job.get('id')
+        if not job_id:
+            return 'Не указано'
+        
+        # Получаем данные для формирования URL
+        category = job.get('category', 'qa')
+        title = job.get('title', '')
+        
+        # Очищаем и форматируем название вакансии для URL
+        if title:
+            # Убираем лишние символы и приводим к нижнему регистру
+            clean_title = title.lower()
+            clean_title = clean_title.replace(' ', '-')
+            clean_title = clean_title.replace('(', '')
+            clean_title = clean_title.replace(')', '')
+            clean_title = clean_title.replace('/', '-')
+            clean_title = clean_title.replace('--', '-')
+            clean_title = clean_title.strip('-')
+        else:
+            clean_title = 'job'
+        
+        # Формируем URL в правильном формате
+        return f"{self.base_url}/{category}/{clean_title}-{job_id}"
     
     
     def log_jobs(self, jobs: List[Dict]):
