@@ -131,4 +131,5 @@ dmypy.json
 # Project specific
 hirehi_scraper.log
 hirehi_jobs.json
+hirehi_filtered_jobs.json
 *.log

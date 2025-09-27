@@ -2,6 +2,7 @@
 """
 Скрипт для получения данных о вакансиях с сайта hirehi.ru
 Получает информацию о QA вакансиях с удаленной работой (senior/middle, auto)
+Дополнительно фильтрует по наличию Kotlin или Android в описании
 """
 
 import requests
@@ -157,6 +158,36 @@ class HireHiScraper:
             'url': f"{self.base_url}/job/{job.get('id', '')}" if job.get('id') else 'Не указано'
         }
     
+    def filter_jobs_by_keywords(self, jobs: List[Dict], keywords: List[str]) -> List[Dict]:
+        """
+        Фильтрует вакансии по наличию ключевых слов в описании и требованиях
+        
+        Args:
+            jobs: Список вакансий
+            keywords: Список ключевых слов для поиска
+            
+        Returns:
+            Отфильтрованный список вакансий
+        """
+        filtered_jobs = []
+        
+        for job in jobs:
+            # Получаем текст из полей description_details и requirements_details
+            description = job.get('description_details', '').lower()
+            requirements = job.get('requirements_details', '').lower()
+            
+            # Объединяем тексты для поиска
+            combined_text = f"{description} {requirements}"
+            
+            # Проверяем наличие любого из ключевых слов
+            if any(keyword.lower() in combined_text for keyword in keywords):
+                filtered_jobs.append(job)
+                logger.debug(f"Вакансия '{job.get('title', '')}' прошла фильтр по ключевым словам")
+            else:
+                logger.debug(f"Вакансия '{job.get('title', '')}' не прошла фильтр по ключевым словам")
+        
+        return filtered_jobs
+    
     
     def log_jobs(self, jobs: List[Dict]):
         """
@@ -196,22 +227,37 @@ class HireHiScraper:
 def main():
     """Основная функция"""
     logger.info("Запуск скрапера hirehi.ru")
+    logger.info("Фильтрация по ключевым словам: Kotlin, Android")
     
     scraper = HireHiScraper()
     
+    # Ключевые слова для фильтрации
+    keywords = ["Kotlin", "Android"]
+    
     try:
         # Получаем все вакансии
-        jobs = scraper.get_all_jobs()
+        all_jobs = scraper.get_all_jobs()
         
-        if not jobs:
+        if not all_jobs:
             logger.warning("Не удалось получить ни одной вакансии")
             return
         
+        logger.info(f"Получено {len(all_jobs)} вакансий до фильтрации")
+        
+        # Фильтруем по ключевым словам
+        filtered_jobs = scraper.filter_jobs_by_keywords(all_jobs, keywords)
+        
+        logger.info(f"После фильтрации по ключевым словам: {len(filtered_jobs)} вакансий")
+        
+        if not filtered_jobs:
+            logger.warning("После фильтрации не осталось ни одной вакансии")
+            return
+        
         # Выводим информацию в лог
-        scraper.log_jobs(jobs)
+        scraper.log_jobs(filtered_jobs)
         
         # Сохраняем в JSON файл
-        scraper.save_to_json(jobs)
+        scraper.save_to_json(filtered_jobs, "hirehi_filtered_jobs.json")
         
         logger.info("Скрапинг завершен успешно!")
         
