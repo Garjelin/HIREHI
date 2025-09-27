@@ -10,6 +10,9 @@ import json
 import logging
 import time
 import re
+import webbrowser
+import os
+from datetime import datetime
 from typing import List, Dict, Optional
 from urllib.parse import urlencode, quote
 
@@ -240,6 +243,69 @@ class HireHiScraper:
             logger.info(f"Данные сохранены в файл: {filename}")
         except Exception as e:
             logger.error(f"Ошибка при сохранении в файл {filename}: {e}")
+    
+    def generate_html_page(self, jobs: List[Dict], total_jobs_count: int = 0, template_path: str = "jobs_template.html", output_path: str = "jobs.html"):
+        """
+        Генерирует HTML страницу с вакансиями
+        
+        Args:
+            jobs: Список вакансий
+            total_jobs_count: Общее количество найденных вакансий (до фильтрации)
+            template_path: Путь к HTML шаблону
+            output_path: Путь для сохранения готовой HTML страницы
+        """
+        try:
+            # Читаем шаблон
+            with open(template_path, 'r', encoding='utf-8') as f:
+                html_content = f.read()
+            
+            # Подготавливаем данные для JavaScript
+            jobs_data = []
+            for job in jobs:
+                job_info = self.extract_job_info(job)
+                jobs_data.append(job_info)
+            
+            # Создаем JavaScript код для вставки данных
+            js_data = f"""
+            <script>
+                // Данные вакансий
+                const jobsData = {json.dumps(jobs_data, ensure_ascii=False, indent=2)};
+                const totalJobsCount = {total_jobs_count};
+            </script>
+            """
+            
+            # Вставляем JavaScript перед закрывающим тегом body
+            html_content = html_content.replace('</body>', f'{js_data}\n</body>')
+            
+            # Сохраняем готовую страницу
+            with open(output_path, 'w', encoding='utf-8') as f:
+                f.write(html_content)
+            
+            logger.info(f"HTML страница создана: {output_path}")
+            return output_path
+            
+        except Exception as e:
+            logger.error(f"Ошибка при создании HTML страницы: {e}")
+            return None
+    
+    def open_in_browser(self, html_file_path: str):
+        """
+        Открывает HTML файл в браузере по умолчанию
+        
+        Args:
+            html_file_path: Путь к HTML файлу
+        """
+        try:
+            # Получаем абсолютный путь к файлу
+            abs_path = os.path.abspath(html_file_path)
+            file_url = f"file://{abs_path}"
+            
+            # Открываем в браузере
+            webbrowser.open(file_url)
+            logger.info(f"Открыта веб-страница: {file_url}")
+            
+        except Exception as e:
+            logger.error(f"Ошибка при открытии браузера: {e}")
 
 
 def main():
@@ -276,6 +342,16 @@ def main():
         
         # Сохраняем в JSON файл
         scraper.save_to_json(filtered_jobs, "hirehi_filtered_jobs.json")
+        
+        # Генерируем HTML страницу
+        html_file = scraper.generate_html_page(filtered_jobs, len(all_jobs))
+        
+        if html_file:
+            # Открываем веб-страницу в браузере
+            scraper.open_in_browser(html_file)
+            logger.info("Веб-страница с вакансиями открыта в браузере!")
+        else:
+            logger.warning("Не удалось создать веб-страницу")
         
         logger.info("Скрапинг завершен успешно!")
         
