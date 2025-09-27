@@ -9,8 +9,9 @@ import requests
 import json
 import logging
 import time
+import re
 from typing import List, Dict, Optional
-from urllib.parse import urlencode
+from urllib.parse import urlencode, quote
 
 # Настройка логирования
 logging.basicConfig(
@@ -202,25 +203,8 @@ class HireHiScraper:
         if not job_id:
             return 'Не указано'
         
-        # Получаем данные для формирования URL
-        category = job.get('category', 'qa')
-        title = job.get('title', '')
-        
-        # Очищаем и форматируем название вакансии для URL
-        if title:
-            # Убираем лишние символы и приводим к нижнему регистру
-            clean_title = title.lower()
-            clean_title = clean_title.replace(' ', '-')
-            clean_title = clean_title.replace('(', '')
-            clean_title = clean_title.replace(')', '')
-            clean_title = clean_title.replace('/', '-')
-            clean_title = clean_title.replace('--', '-')
-            clean_title = clean_title.strip('-')
-        else:
-            clean_title = 'job'
-        
-        # Формируем URL в правильном формате
-        return f"{self.base_url}/{category}/{clean_title}-{job_id}"
+        # Простая логика: фиксированный префикс + ID
+        return f"{self.base_url}/qa/qa-testirovshchik-auto-{job_id}"
     
     
     def log_jobs(self, jobs: List[Dict]):
