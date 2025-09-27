@@ -355,6 +355,12 @@ def main():
         
         logger.info("Скрапинг завершен успешно!")
         
+        # Предлагаем запустить веб-сервер
+        print("\n" + "="*60)
+        print("Для запуска веб-сервера с кнопкой обновления выполните:")
+        print("python simple_web_server.py")
+        print("="*60)
+        
     except Exception as e:
         logger.error(f"Критическая ошибка: {e}")
 
