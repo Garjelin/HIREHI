@@ -2,9 +2,11 @@
 
 Скрипт для автоматического сбора и отображения QA вакансий с сайта hirehi.ru с фильтрацией по ключевым словам Kotlin и Android.
 
-## 🌐 Онлайн версия
+## 🌐 Онлайн версии
 
-**Статическая версия доступна на GitHub Pages:** [https://garjelin.github.io/HIREHI/](https://garjelin.github.io/HIREHI/)
+**Статическая версия (GitHub Pages):** [https://garjelin.github.io/HIREHI/](https://garjelin.github.io/HIREHI/)
+
+**Интерактивная версия (Render.com):** [https://hirehi-qa-jobs.onrender.com/](https://hirehi-qa-jobs.onrender.com/) *(с кнопкой обновления)*
 
 ## 🚀 Возможности
 
@@ -13,11 +15,13 @@
 - **Красивый веб-интерфейс** с современным дизайном
 - **Кликабельные ссылки** на вакансии
 - **Статическая версия** для GitHub Pages
+- **Интерактивная версия** с кнопкой обновления на Render.com
 
 ## 📋 Требования
 
 - Python 3.7+
 - requests
+- Flask (для Render.com версии)
 - webbrowser (встроенный модуль)
 
 ## 🛠 Установка и запуск
@@ -30,7 +34,11 @@ cd HIREHI
 
 ### 2. Установка зависимостей
 ```bash
+# Для локального запуска
 pip install requests
+
+# Для Flask приложения (Render.com)
+pip install -r requirements.txt
 ```
 
 ### 3. Запуск скрипта
@@ -40,6 +48,9 @@ python hirehi_scraper.py
 
 # Генерация статической версии для GitHub Pages
 python generate_static.py
+
+# Запуск Flask приложения (для Render.com)
+python app.py
 ```
 
 ## 📁 Структура проекта
@@ -50,7 +61,10 @@ HIREHI/
 ├── jobs_template.html     # HTML шаблон
 ├── index.html            # Статическая версия для GitHub Pages
 ├── generate_static.py    # Генератор статической версии
-├── .gitignore           # Исключения для Git
+├── app.py               # Flask приложение для Render.com
+├── requirements.txt     # Зависимости для Flask
+├── render.yaml         # Конфигурация для Render.com
+├── .gitignore          # Исключения для Git
 └── README.md
 ```
 
@@ -70,9 +84,11 @@ keywords = ["Kotlin", "Android"]
 - `level`: уровень (по умолчанию ['senior', 'middle'])
 - `subcategory`: подкатегория (по умолчанию 'auto')
 
-## 🌐 Развертывание на GitHub Pages
+## 🌐 Развертывание
 
-### Автоматическое обновление
+### GitHub Pages (Статическая версия)
+
+#### Автоматическое обновление
 1. Запустите скрипт локально для получения свежих данных
 2. Выполните `python generate_static.py` для обновления статической версии
 3. Зафиксируйте изменения и отправьте в репозиторий:
@@ -82,12 +98,29 @@ git commit -m "Обновление данных вакансий"
 git push origin main
 ```
 
-### Настройка GitHub Pages
+#### Настройка GitHub Pages
 1. Перейдите в Settings вашего репозитория
 2. Найдите раздел "Pages"
 3. В "Source" выберите "Deploy from a branch"
 4. Выберите ветку "main" и папку "/ (root)"
 5. Сохраните настройки
+
+### Render.com (Интерактивная версия)
+
+#### Развертывание на Render.com
+1. Зарегистрируйтесь на [render.com](https://render.com)
+2. Подключите ваш GitHub репозиторий
+3. Создайте новый Web Service:
+   - **Build Command:** `pip install -r requirements.txt`
+   - **Start Command:** `python app.py`
+   - **Environment:** Python 3
+4. Render автоматически развернет ваше приложение
+
+#### Преимущества Render.com версии:
+- ✅ **Кнопка обновления** - обновляйте данные без перезапуска
+- ✅ **API endpoints** - `/api/refresh` и `/api/status`
+- ✅ **Автоматическое развертывание** из GitHub
+- ✅ **Бесплатный тариф** для небольших проектов
 
 ## 📊 Формат данных
 
@@ -105,10 +138,14 @@ git push origin main
 
 ## 🔄 Обновление данных
 
-Для обновления данных на GitHub Pages:
+### GitHub Pages (Статическая версия)
 1. Запустите `python hirehi_scraper.py` для сбора новых данных
 2. Запустите `python generate_static.py` для генерации статической версии
 3. Зафиксируйте изменения и отправьте в репозиторий
+
+### Render.com (Интерактивная версия)
+- **Автоматическое обновление** через кнопку "🔄 Обновить данные" на сайте
+- **API endpoint** `/api/refresh` для программного обновления
 
 ## 📝 Логирование
 

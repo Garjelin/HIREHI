@@ -32,7 +32,6 @@ venv.bak/
 logs/
 
 # Data files (будут генерироваться)
-hirehi_filtered_jobs.json
 hirehi_jobs.json
 
 # Local HTML files
