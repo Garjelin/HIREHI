@@ -12,7 +12,6 @@
 - **Фильтрация** по ключевым словам (Kotlin, Android)
 - **Красивый веб-интерфейс** с современным дизайном
 - **Кликабельные ссылки** на вакансии
-- **Локальный веб-сервер** с кнопкой обновления
 - **Статическая версия** для GitHub Pages
 
 ## 📋 Требования
@@ -39,9 +38,8 @@ pip install requests
 # Простой запуск с открытием браузера
 python hirehi_scraper.py
 
-# Запуск веб-сервера с кнопкой обновления
-python simple_web_server.py
-# Откройте http://localhost:5000
+# Генерация статической версии для GitHub Pages
+python generate_static.py
 ```
 
 ## 📁 Структура проекта
@@ -49,11 +47,10 @@ python simple_web_server.py
 ```
 HIREHI/
 ├── hirehi_scraper.py      # Основной скрипт
-├── simple_web_server.py   # Веб-сервер с API
 ├── jobs_template.html     # HTML шаблон
 ├── index.html            # Статическая версия для GitHub Pages
 ├── generate_static.py    # Генератор статической версии
-├── hirehi_filtered_jobs.json  # Данные вакансий
+├── .gitignore           # Исключения для Git
 └── README.md
 ```
 
@@ -106,11 +103,12 @@ git push origin main
 }
 ```
 
-## 🔄 API Endpoints (для веб-сервера)
+## 🔄 Обновление данных
 
-- `GET /` - Главная страница
-- `POST /api/refresh` - Обновление данных
-- `GET /api/status` - Статус сервера
+Для обновления данных на GitHub Pages:
+1. Запустите `python hirehi_scraper.py` для сбора новых данных
+2. Запустите `python generate_static.py` для генерации статической версии
+3. Зафиксируйте изменения и отправьте в репозиторий
 
 ## 📝 Логирование
 
@@ -132,4 +130,4 @@ git push origin main
 - Скрипт делает запросы к API hirehi.ru с задержками
 - Не злоупотребляйте частотой запросов
 - Данные обновляются только при запуске скрипта
-- GitHub Pages версия статическая (без возможности обновления через кнопку)
+- GitHub Pages версия статическая (обновляется через Git)
